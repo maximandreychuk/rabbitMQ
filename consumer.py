@@ -22,6 +22,7 @@ def process_new_message(
     properties: "BasicProperties",
     body: bytes
 ):
+    ch.basic_ack(delivery_tag=method.delivery_tag)
     log.warning(f"Finish processing messages {body}")
 
 
@@ -29,7 +30,7 @@ def consume_message(channel: "BlockingChannel") -> None:
     channel.basic_consume(
         queue=MQ_ROUTING_KEY,
         on_message_callback=process_new_message,
-        auto_ack=True
+        auto_ack=True  # автоматический обработчик
     )
     log.warning(f"Waiting for messages")
     channel.start_consuming()
