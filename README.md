@@ -14,7 +14,7 @@
 
 - docker compose pull
 - docker compose up -d
-  адрес 0.0.0.0:15672
+- адрес 0.0.0.0:15672
 
 Run:
 
