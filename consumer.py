@@ -1,4 +1,6 @@
 import logging
+import time
+
 from typing import TYPE_CHECKING
 from random import randint
 
@@ -22,15 +24,34 @@ def process_new_message(
     properties: "BasicProperties",
     body: bytes
 ):
-    ch.basic_ack(delivery_tag=method.delivery_tag)
-    log.warning(f"Finish processing messages {body}")
+    log.debug("ch: %s", ch)
+    log.debug("method: %s", method)
+    log.debug("properties: %s", properties)
+    log.debug("body: %s", body)
+
+    log.warning("[ ] Start processing message (expensive task) %r", body)
+
+    start_time = time.time()
+    time.sleep(1)
+    end_time = time.time()
+
+    log.info(f"Finish processing messages {body}")# ручное распределение
+    ch.basic_ack(delivery_tag=method.delivery_tag) # в связке с channel.basic_qos(prefetch_count=1)
+
+    log.warning(
+  "[X] Finished in %.2fs processing message %r",
+  end_time-start_time,
+        body
+    )
+
 
 
 def consume_message(channel: "BlockingChannel") -> None:
+    channel.basic_qos(prefetch_count=1)
     channel.basic_consume(
         queue=MQ_ROUTING_KEY,
         on_message_callback=process_new_message,
-        auto_ack=True  # автоматический обработчик
+        # auto_ack=True,  # автоматический обработчик
     )
     log.warning(f"Waiting for messages")
     channel.start_consuming()
