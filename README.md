@@ -20,3 +20,7 @@ Run:
 
 - python consumer.py для запуска потребителя
 - python publisher.py для запуска отправителя
+
+
+Links:
+- https://www.rabbitmq.com/docs/consumer-prefetch
