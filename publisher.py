@@ -15,20 +15,23 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
+def declare_queue(channel: "BlockingChannel") -> None:
+    queue = channel.queue_declare(queue=MQ_ROUTING_KEY)
+    log.info(f"Declared queue {MQ_ROUTING_KEY}, {queue}")
 
-def produce_message(channel: "BlockingChannel"):
-    while True:
-        queue = channel.queue_declare(queue=MQ_ROUTING_KEY)
-        log.info(f"Declared queue {MQ_ROUTING_KEY}, {queue}")
-        message_body = f"This is my number {randint(1, 100)}"
-        log.debug(f"Publish message {message_body}")
-        channel.basic_publish(
-            exchange=MQ_EXCHANGE,
-            routing_key=MQ_ROUTING_KEY,
-            body=message_body
-        )
-        log.warning(f"Published message {message_body}")
-        time.sleep(randint(4, 10))
+
+
+def produce_message(channel: "BlockingChannel", idx: int):
+    message_body = f"This is my number #{idx:02d}"
+    log.debug(f"Publish message {message_body}")
+    channel.basic_publish(
+        exchange=MQ_EXCHANGE,
+        routing_key=MQ_ROUTING_KEY,
+        body=message_body
+    )
+    log.warning(f"Published message {message_body}")
+
+
 
 
 def main():
@@ -37,7 +40,11 @@ def main():
         log.info(f"Created connection {connection}")
         with connection.channel() as channel:
             log.info(f"Created channel {channel}")
-            produce_message(channel=channel)
+            declare_queue(channel=channel)
+            for idx in range(1,11):
+                produce_message(channel=channel, idx=idx)
+                time.sleep(3)
+
 
 
 if __name__ == "__main__":
