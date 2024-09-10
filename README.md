@@ -25,3 +25,4 @@ Run:
 Links:
 - https://www.rabbitmq.com/docs/consumer-prefetch
 - https://pika.readthedocs.io/en/stable/modules/channel.html
+- https://www.rabbitmq.com/tutorials
